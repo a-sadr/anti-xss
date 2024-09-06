@@ -129,6 +129,13 @@ final class XssTest extends \PHPUnit\Framework\TestCase
             ' < 1 year' => ' < 1 year',
             '> 1 year' => '> 1 year',
             '<p>onend</p>' => '<p>onend</p>',
+            '<p>onend</p>onend' => '<p>onend</p>onend',
+            '<p>onend</p> onend' => '<p>onend</p> onend',
+            '<p>onend</p> onend ' => '<p>onend</p> onend ',
+            '<p>onend</p> onend <p>onend</p>' => '<p>onend</p> onend <p>onend</p>',
+            '<p>onend</p> onend <p>onend</p> onend' => '<p>onend</p> onend <p>onend</p> onend',
+            '<img src="https://example.com/image.jpg" alt="onend" />' => '<img src="https://example.com/image.jpg" alt="onend" />',
+            '<ul><li>onend</li></ul>' => '<ul><li>onend</li></ul>',
         ];
 
         $antiXss->removeEvilAttributes(['style']); // allow style-attributes
@@ -312,6 +319,11 @@ final class XssTest extends \PHPUnit\Framework\TestCase
             '<a href="http://test.com?param1="+on💩MouseOver💩%3D"alert%281%29%3B&step=2&param12=A">test💩</a>'                      => '<a href="http://test.com?param1=">test💩</a>',
             '<a href="http://test.com?param1=lall&colon=foo;">test</a>'                                                           => '<a href="http://test.com?param1=lall&colon=foo;">test</a>',
             '<a href="http://test.com?param1=lall&colon;=foo;">test</a>'                                                          => '<a href="http://test.com?param1=lall&colon;=foo;">test</a>',
+            '<a href="http://test.com?param1=lall&colon+lall;">test</a>'                                                          => '<a href="http://test.com?param1=lall&colon+lall;">test</a>',
+            '<a href="javascript:alert(\'xss\')">xss</a>'                                                                         => '<a href="[removed](\'xss\')">xss</a>',
+            '<li style="list-style-image: url(alert&#40;0&#41;)">'                                                                => '<li [removed]>',
+            
+
         ];
 
         $antiXss->setReplacement('[removed]');
